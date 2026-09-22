@@ -1,30 +1,60 @@
-import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { COURSES_DATA } from './courseContent';
+import { getMemoryDb } from './memoryDb';
 
-const DB_PATH = path.join(process.cwd(), 'database', 'academy.db');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let dbInstance: any = null;
 
-// Ensure database directory exists
-const dbDir = path.dirname(DB_PATH);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getDb(): any {
+  if (dbInstance) return dbInstance;
 
-let db: Database.Database;
+  try {
+    // Attempt to load better-sqlite3 dynamically
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Database = require('better-sqlite3');
+    const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    let dbPath: string;
 
-export function getDb(): Database.Database {
-  if (!db) {
-    db = new Database(DB_PATH);
-    db.pragma('journal_mode = WAL');
-    db.pragma('foreign_keys = ON');
-    initializeSchema();
+    if (isVercel) {
+      dbPath = path.join('/tmp', 'academy.db');
+      const sourceDbPath = path.join(process.cwd(), 'database', 'academy.db');
+      if (fs.existsSync(/*turbopackIgnore: true*/ sourceDbPath) && !fs.existsSync(/*turbopackIgnore: true*/ dbPath)) {
+        try {
+          fs.copyFileSync(sourceDbPath, dbPath);
+        } catch {
+          // Ignore copy errors
+        }
+      }
+    } else {
+      dbPath = path.join(process.cwd(), 'database', 'academy.db');
+      const dir = path.dirname(dbPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    }
+
+    const d = new Database(dbPath);
+    try {
+      d.pragma('journal_mode = WAL');
+      d.pragma('foreign_keys = ON');
+    } catch {
+      // WAL mode may fail on certain mounted or read-only filesystems
+    }
+
+    initializeSchema(d);
+    dbInstance = d;
+    return dbInstance;
+  } catch (err) {
+    console.warn('⚠️ Notice: better-sqlite3 native driver unavailable on this host, falling back to seamless in-memory database engine:', err);
+    dbInstance = getMemoryDb();
+    return dbInstance;
   }
-  return db;
 }
 
-function initializeSchema() {
-  const d = db;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function initializeSchema(d: any) {
 
   d.exec(`
     CREATE TABLE IF NOT EXISTS users (
@@ -177,7 +207,8 @@ function initializeSchema() {
   }
 }
 
-function seedData(d: Database.Database) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function seedData(d: any) {
   const insertOrUpdateCourse = d.prepare(`
     INSERT INTO courses (slug, title, description, difficulty, order_index, icon)
     VALUES (?, ?, ?, ?, ?, ?)
