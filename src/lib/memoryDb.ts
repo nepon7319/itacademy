@@ -307,7 +307,55 @@ class MemoryDbStore {
       return this.projects.filter(p => p.course_id === cid);
     }
 
-    // 12. User progress
+    // 12. Next lesson query
+    if (lower.includes('from lessons l join courses c') || (lower.includes('from lessons l') && lower.includes('not in (select lesson_id'))) {
+      const uid = Number(params[0] ?? 0);
+      const uncompletedLesson = this.lessons.find(l => !this.progress.some(p => p.user_id === uid && p.lesson_id === l.id)) || this.lessons[0];
+      if (!uncompletedLesson) return [];
+      const course = this.courses.find(c => c.id === uncompletedLesson.course_id);
+      return [{
+        id: uncompletedLesson.id,
+        title: uncompletedLesson.title,
+        slug: uncompletedLesson.slug,
+        course_slug: course ? course.slug : 'ai-fundamentals',
+        course_title: course ? course.title : 'AI Fundamentals',
+      }];
+    }
+
+    // 13. Recent activity with joins (profile page)
+    if (lower.includes('from user_progress up join lessons l') || lower.includes('from user_progress up')) {
+      const uid = Number(params[0]);
+      const userProg = this.progress.filter(p => p.user_id === uid);
+      return userProg.map(p => {
+        const l = this.lessons.find(x => x.id === p.lesson_id);
+        const c = l ? this.courses.find(x => x.id === l.course_id) : null;
+        return {
+          completed_at: p.completed_at,
+          lesson_title: l ? l.title : 'Lesson',
+          xp_reward: l ? l.xp_reward : 10,
+          course_title: c ? c.title : 'Course',
+          course_slug: c ? c.slug : 'ai-fundamentals',
+        };
+      });
+    }
+
+    // 14. Admin user list
+    if (lower.includes('from users u left join profiles p') || lower.includes('from users u')) {
+      return this.users.map(u => {
+        const p = this.profiles.find(x => x.user_id === u.id);
+        return {
+          id: u.id,
+          username: u.username,
+          email: u.email,
+          role: u.role,
+          created_at: u.created_at,
+          xp: p ? p.xp : 0,
+          level: p ? p.level : 1,
+        };
+      });
+    }
+
+    // 15. User progress
     if (lower.includes('from user_progress where user_id = ? and lesson_id = ?')) {
       const uid = Number(params[0]);
       const lid = Number(params[1]);
@@ -319,7 +367,7 @@ class MemoryDbStore {
       return this.progress.filter(x => x.user_id === uid);
     }
 
-    // 13. Streaks
+    // 16. Streaks
     if (lower.includes('from streaks where user_id = ?')) {
       const uid = Number(params[0]);
       return this.streaks.filter(x => x.user_id === uid && x.completed === 1);
