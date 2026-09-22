@@ -1,0 +1,226 @@
+.page { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--bg-secondary);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: var(--z-above);
+}
+
+.sidebarLogo {
+  display: flex; align-items: center;
+  height: 64px; padding: var(--space-6);
+  font-size: 0.65rem; font-weight: 900;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--white); border-bottom: 1px solid var(--border);
+}
+
+.sidebarNav {
+  flex: 1; padding: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-1);
+}
+
+.sidebarLink {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: 10px var(--space-3); border-radius: var(--radius);
+  font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.sidebarLink:hover, .sidebarLinkActive {
+  background: var(--bg-tertiary); color: var(--white);
+}
+
+.sidebarBottom { padding: var(--space-4); border-top: 1px solid var(--border); }
+.logoutBtn { font-size: 0.75rem; color: var(--text-tertiary); transition: color var(--transition-fast); cursor: pointer; }
+.logoutBtn:hover { color: var(--white); }
+
+.main { flex: 1; margin-left: 240px; min-height: 100vh; }
+
+.topBar {
+  display: flex; align-items: center;
+  padding: 0 var(--space-8); height: 64px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  position: sticky; top: 0; z-index: var(--z-above);
+}
+
+.pageTitle {
+  font-size: 1rem; font-weight: 900;
+  letter-spacing: 0.05em; color: var(--white);
+}
+
+.content {
+  padding: var(--space-8);
+  display: flex; flex-direction: column; gap: var(--space-6);
+  max-width: 900px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+/* Profile Hero */
+.profileHero {
+  display: flex; align-items: flex-start; gap: var(--space-6);
+  padding: var(--space-8);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.avatar {
+  width: 72px; height: 72px;
+  background: var(--white);
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; font-weight: 900; color: var(--black);
+  flex-shrink: 0;
+}
+
+.profileInfo { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.username {
+  font-size: 1.5rem; font-weight: 900;
+  letter-spacing: -0.02em; color: var(--white);
+}
+
+/* Level Track */
+.levelTrack {
+  display: flex; gap: 0;
+  position: relative;
+}
+
+.levelTrack::before {
+  content: '';
+  position: absolute;
+  top: 14px; left: 14px; right: 14px;
+  height: 1px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.levelStep {
+  display: flex; flex-direction: column;
+  align-items: center; gap: var(--space-2);
+  flex: 1; position: relative; z-index: 1;
+}
+
+.levelStepDot {
+  width: 28px; height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 700;
+  color: var(--text-tertiary);
+  background: var(--bg-primary);
+  transition: all var(--transition);
+}
+
+.levelStepDone .levelStepDot {
+  background: var(--white); color: var(--black);
+  border-color: var(--white); font-size: 0.7rem;
+}
+
+.levelStepCurrent .levelStepDot {
+  border-color: var(--gray-500);
+  color: var(--white);
+}
+
+.levelStepName {
+  font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-tertiary); text-align: center;
+}
+
+.levelStepDone .levelStepName, .levelStepCurrent .levelStepName {
+  color: var(--text-secondary);
+}
+
+/* Stats */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.statCard {
+  display: flex; flex-direction: column; gap: var(--space-2);
+}
+
+.statVal {
+  font-size: 1.3rem; font-weight: 800;
+  color: var(--white); letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* Streak Grid */
+.streakGrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--space-1);
+}
+
+.streakCell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.streakCellDone {
+  background: var(--white);
+  border-color: var(--white);
+}
+
+/* Achievements */
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.achievementCard {
+  display: flex; align-items: flex-start;
+  gap: var(--space-3); padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  transition: all var(--transition-fast);
+}
+
+.achievementLocked { opacity: 0.35; }
+
+.achievementIcon {
+  width: 40px; height: 40px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+  color: var(--white);
+}
+
+.achievementTitle {
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--white); letter-spacing: 0.02em;
+  margin-bottom: 2px;
+}
+
+@media (max-width: 1024px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding-bottom: 80px; }
+}
+
+@media (max-width: 768px) {
+  .content { padding: var(--space-4); }
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .achievementsGrid { grid-template-columns: 1fr; }
+  .levelTrack { display: none; }
+  .streakGrid { grid-template-columns: repeat(6, 1fr); }
+}
